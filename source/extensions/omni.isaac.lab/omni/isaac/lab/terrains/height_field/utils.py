@@ -41,9 +41,12 @@ def height_field_to_mesh(func: Callable) -> Callable:
                 f" horizontal scale ({cfg.horizontal_scale})."
             )
         # allocate buffer for height field (with border)
-        width_pixels = int(cfg.size[0] / cfg.horizontal_scale) + 1
-        length_pixels = int(cfg.size[1] / cfg.horizontal_scale) + 1
-        border_pixels = int(cfg.border_width / cfg.horizontal_scale) + 1
+        # width_pixels = int(cfg.size[0] / cfg.horizontal_scale) + 1
+        # length_pixels = int(cfg.size[1] / cfg.horizontal_scale) + 1
+        # border_pixels = int(cfg.border_width / cfg.horizontal_scale) + 1
+        width_pixels = int(cfg.size[0] / cfg.horizontal_scale)
+        length_pixels = int(cfg.size[1] / cfg.horizontal_scale)
+        border_pixels = int(cfg.border_width / cfg.horizontal_scale)
         heights = np.zeros((width_pixels, length_pixels), dtype=np.int16)
         # override size of the terrain to account for the border
         sub_terrain_size = [width_pixels - 2 * border_pixels, length_pixels - 2 * border_pixels]
@@ -54,7 +57,10 @@ def height_field_to_mesh(func: Callable) -> Callable:
         # generate the height field
         z_gen = func(difficulty, cfg)
         # handle the border for the terrain
-        heights[border_pixels:-border_pixels, border_pixels:-border_pixels] = z_gen
+        if border_pixels == 0:
+            heights[:, :] = z_gen
+        else:
+            heights[border_pixels:-border_pixels, border_pixels:-border_pixels] = z_gen
         # set terrain size back to config
         cfg.size = terrain_size
 
