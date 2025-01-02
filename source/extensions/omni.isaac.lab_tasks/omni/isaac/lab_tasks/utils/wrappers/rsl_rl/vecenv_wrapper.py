@@ -43,7 +43,7 @@ class RslRlVecEnvWrapper(VecEnv):
         https://github.com/leggedrobotics/rsl_rl/blob/master/rsl_rl/env/vec_env.py
     """
 
-    def __init__(self, env: ManagerBasedRLEnv | DirectRLEnv):
+    def __init__(self, env):
         """Initializes the wrapper.
 
         Note:
@@ -144,6 +144,16 @@ class RslRlVecEnvWrapper(VecEnv):
         else:
             obs_dict = self.unwrapped._get_observations()
         return obs_dict["policy"], {"observations": obs_dict}
+    
+    def get_pos(self) -> torch.Tensor:
+        """Returns the current position of the agent in the environment."""
+        assert hasattr(self.unwrapped, "get_pos"), "The environment does not have a _get_pos method."
+        return self.unwrapped.get_pos()
+    
+    def get_heading(self) -> torch.Tensor:
+        """Returns the current heading of the agent in the environment."""
+        assert hasattr(self.unwrapped, "get_heading"), "The environment does not have a _get_heading method."
+        return self.unwrapped.get_heading()
 
     @property
     def episode_length_buf(self) -> torch.Tensor:
